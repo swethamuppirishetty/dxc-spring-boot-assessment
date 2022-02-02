@@ -67,7 +67,17 @@ public class PersonController {
 
     @PutMapping("/person/{id}")
     public Person updatePerson(@RequestBody Person person,@PathVariable int id){
-       return personService.updatePerson(person);
+       return personService.getPersonById(id)
+       .map(author -> {
+         person.setName(person.getName());
+         person.setEmail(person.getEmail());
+         person.setDOB(LocalDate.now());
+         return personService.save(person);
+       })
+       .orElseGet(() -> {
+         person.setId(id);
+         return personService.save(person);
+       });
     }
 
     @DeleteMapping("/person/{id}")
